@@ -2,15 +2,17 @@ import { useRef, useState } from "react";
 import classes from "./Form.module.css"
 import { Board } from "./Board";
 
+export interface IFormData {
+    date: string;
+    distance: string;
+}
+
 export function Form() {
     const [formData, setFormData] = useState(Array<IFormData>)
     const inputDate = useRef<HTMLInputElement>(null);
     const inputDistance = useRef<HTMLInputElement>(null);
 
-    interface IFormData {
-        date: string;
-        distance: string;
-    }
+
 
     let itemArr: Array<IFormData>
 
@@ -43,9 +45,10 @@ export function Form() {
         event.preventDefault();
 
         itemArr = formData;
-        console.log(formData)
+
         let date = inputDate.current?.value;
         let distance = inputDistance.current?.value;
+
         if (date === undefined || distance === undefined) {
             return
         }
@@ -66,7 +69,7 @@ export function Form() {
         }
 
         let sortItemArr = itemArr.sort((a, b) => {
-            
+
             if (new Date(a.date) > new Date(b.date)) {
                 return 1
             } else if (new Date(a.date) < new Date(b.date)) {
@@ -74,6 +77,11 @@ export function Form() {
             }
             return 0
         })
+
+        if (inputDate.current !== null && inputDistance.current !== null) {
+            inputDate.current.value = "";
+            inputDistance.current.value = "";
+        }
 
         setFormData([...sortItemArr])
 
