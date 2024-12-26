@@ -1,73 +1,91 @@
-import {useRef, useState } from "react";
+import { useRef, useState } from "react";
 import classes from "./Form.module.css"
 import { Board } from "./Board";
 
 export function Form() {
-    const [formData, setFormData] = useState({ date: "", distance: "" })
+    const [formData, setFormData] = useState([])
     const inputDate = useRef<HTMLInputElement>(null);
     const inputDistance = useRef<HTMLInputElement>(null);
-
-    let item
-
-    const inputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData((prevForm) => ({
-            ...prevForm,
-            [event.target.name]: event.target.value
-        }))
+    interface IFormData {
+        date: string | undefined;
+        distance: string | undefined;
     }
+
+    let itemArr: Array<IFormData>
 
     const isValid = () => {
 
         const dataVerify = /^([1-9]|1[0-9]|2[0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/;
         const distanceVerify = /(^\d+$|^\d+.\d+$)/;
 
-        if (!dataVerify.test(formData.date)) {
-            if (inputDate.current !== null) {
-                inputDate.current.setCustomValidity("Неправильно указана дата");
-                inputDate.current.reportValidity();
-            }
-        } else {
-            if (inputDate.current !== null) {
-                inputDate.current.setCustomValidity("");
-            }
+        if (!dataVerify.test(inputDate.current === null ? "Non Valid String" : inputDate.current.value)) {
 
+            inputDate.current?.setCustomValidity("Неправильно указана дата");
+            inputDate.current?.reportValidity();
+
+        } else {
+            inputDate.current?.setCustomValidity("");
         }
 
-        if (!distanceVerify.test(formData.distance)) {
-            if (inputDistance.current !== null) {
-                inputDistance.current.setCustomValidity("Неправильно указано расстояние");
-                inputDistance.current.reportValidity()
-            }
+        if (!distanceVerify.test(inputDistance.current === null ? "Non Valid String" : inputDistance.current.value)) {
+
+            inputDistance.current?.setCustomValidity("Неправильно указано расстояние");
+            inputDistance.current?.reportValidity()
+
         }
         else {
-            if (inputDistance.current !== null) {
-                inputDistance.current.setCustomValidity("");
-            }
-
+            inputDistance.current?.setCustomValidity("");
         }
     }
 
     const formSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        item = formData;
         
-        setFormData({ date: "", distance: "" }); 
-        console.log(item)
+        itemArr = formData;
+        console.log(formData)
+        let date = inputDate.current?.value;
+        let distance = inputDistance.current?.value;
+
+        if (itemArr.length === 0) {
+            itemArr.push({ date: date, distance: distance })
+        } else {
+            let count:number = 0;
+            itemArr.forEach((element) => {
+                if (element.date === date) {
+                    element.distance = String(Number(element.distance) + Number(distance))
+                } else {
+                    count++;
+                }
+            })
+            if(count === itemArr.length) {
+                itemArr.push({ date: date, distance: distance })
+            }
+        }
+        let sortItemArr = itemArr.sort((a, b) => {
+            if (a.date > b.date) {
+                return 1
+            } else if (a.date < b.date) {
+                return -1
+            }
+            return 0
+        })
+        setFormData([...sortItemArr])
+        
     }
 
     return (<>
         <form className={classes["form"]} onSubmit={formSubmit}>
             <div className={classes["box"]}>
                 <label className={classes["label"]} htmlFor="date">{"Дата (ДД.ММ.ГГГГ)"}</label>
-                <input className={classes["input"]} ref={inputDate} type="text" id="date" value={formData.date} placeholder="ДД.ММ.ГГГГ" name="date" onChange={inputChange} />
+                <input className={classes["input"]} ref={inputDate} type="text" id="date" placeholder="ДД.ММ.ГГГГ" name="date" />
             </div>
             <div className={classes["box"]}>
                 <label className={classes["label"]} htmlFor="distance">Пройдено, км</label>
-                <input className={classes["input"]} ref={inputDistance} type="text" id="distance" name="distance" value={formData.distance} placeholder="10.5" onChange={inputChange} />
+                <input className={classes["input"]} ref={inputDistance} type="text" id="distance" name="distance" placeholder="10.5" />
             </div>
             <button className={classes["button"]} onClick={isValid}>ОК</button>
         </form>
-        <Board item = {item}/>
-        </>
+        <Board item={formData} />
+    </>
     )
 }
