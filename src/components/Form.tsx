@@ -3,12 +3,13 @@ import classes from "./Form.module.css"
 import { Board } from "./Board";
 
 export function Form() {
-    const [formData, setFormData] = useState([])
+    const [formData, setFormData] = useState(Array<IFormData>)
     const inputDate = useRef<HTMLInputElement>(null);
     const inputDistance = useRef<HTMLInputElement>(null);
+
     interface IFormData {
-        date: string | undefined;
-        distance: string | undefined;
+        date: string;
+        distance: string;
     }
 
     let itemArr: Array<IFormData>
@@ -40,16 +41,18 @@ export function Form() {
 
     const formSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        
+
         itemArr = formData;
         console.log(formData)
         let date = inputDate.current?.value;
         let distance = inputDistance.current?.value;
-
+        if (date === undefined || distance === undefined) {
+            return
+        }
         if (itemArr.length === 0) {
             itemArr.push({ date: date, distance: distance })
         } else {
-            let count:number = 0;
+            let count: number = 0;
             itemArr.forEach((element) => {
                 if (element.date === date) {
                     element.distance = String(Number(element.distance) + Number(distance))
@@ -57,20 +60,23 @@ export function Form() {
                     count++;
                 }
             })
-            if(count === itemArr.length) {
+            if (count === itemArr.length) {
                 itemArr.push({ date: date, distance: distance })
             }
         }
+
         let sortItemArr = itemArr.sort((a, b) => {
-            if (a.date > b.date) {
+            
+            if (new Date(a.date) > new Date(b.date)) {
                 return 1
-            } else if (a.date < b.date) {
+            } else if (new Date(a.date) < new Date(b.date)) {
                 return -1
             }
             return 0
         })
+
         setFormData([...sortItemArr])
-        
+
     }
 
     return (<>
