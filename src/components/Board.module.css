@@ -1,0 +1,31 @@
+.board_nav {
+    display: flex;
+    margin-top: 10px;
+}
+
+.nav_item { 
+    width: calc(100% / 3);
+}
+
+.board {
+    border: 2px solid black;
+    border-radius: 15px;
+}
+
+.board:empty {
+    height: 20px;
+}
+
+.boars_item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.props_item {
+    width: calc(100% / 3);
+}
+
+.delet_button{
+    display: inline;
+    cursor: pointer;
+}

@@ -18,7 +18,7 @@ export function Form() {
 
     const isValid = () => {
 
-        const dataVerify = /^([1-9]|1[0-9]|2[0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/;
+        const dataVerify = /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\.(0[1-9]|1[0-2])\.\d{4}$/;
         const distanceVerify = /(^\d+$|^\d+.\d+$)/;
 
         if (!dataVerify.test(inputDate.current === null ? "Non Valid String" : inputDate.current.value)) {
@@ -39,6 +39,12 @@ export function Form() {
         else {
             inputDistance.current?.setCustomValidity("");
         }
+    }
+
+    function deleteItem (index:number) {
+        itemArr = formData;
+        itemArr.splice(index, 1);
+        setFormData([...itemArr])
     }
 
     const formSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -68,7 +74,7 @@ export function Form() {
             }
         }
 
-        let sortItemArr = itemArr.sort((a, b) => {
+        itemArr = itemArr.sort((a, b) => {
 
             if (new Date(a.date) > new Date(b.date)) {
                 return 1
@@ -83,9 +89,10 @@ export function Form() {
             inputDistance.current.value = "";
         }
 
-        setFormData([...sortItemArr])
+        setFormData([...itemArr])
 
     }
+
 
     return (<>
         <form className={classes["form"]} onSubmit={formSubmit}>
@@ -99,7 +106,7 @@ export function Form() {
             </div>
             <button className={classes["button"]} onClick={isValid}>ОК</button>
         </form>
-        <Board item={formData} />
+        <Board item={formData} delete = { deleteItem } />
     </>
     )
 }
